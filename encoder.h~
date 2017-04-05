@@ -1,0 +1,16 @@
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavutil/imgutils.h>
+#include <libavutil/opt.h>
+#include <libswscale/swscale.h>
+}
+
+static void frameRGBtoYUV(uint_t *rgb);
+
+void encoderStart(const char *filename, int codec_id, int fps, int width, int height);
+
+void encoderFinish();
+
+void frameEncode(uint_t *rgb);
+
+void glReadRGB(uint8_t **rgb, GLubyte **pixels, unsigned int width, unsigned int height);
