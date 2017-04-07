@@ -46,7 +46,10 @@ const GLfloat quad[4][2] = {
 
 //shader uniforms
 static glm::vec2 uResolution((float)HEIGHT, (float)WIDTH);
-static float time = 0f;
+static float time = 0.0;
+
+static const float MS_PER_SECOND = 1000.0;
+static unsigned int startTime;
 
 static int model_finished(void) {
     return nframes >= max_nframes;
@@ -95,6 +98,11 @@ static void draw_scene(void) {
   //set uniforms
   glUniform2fv( glGetUniformLocation(shaderprogram, "resolution"), 1, glm::value_ptr(uResolution) );
 
+  time = (float)(glutGet(GLUT_ELAPSED_TIME) - startTime) / MS_PER_SECOND; 
+
+  glUniform1f( glGetUniformLocation(shaderprogram, "time"), time);
+
+  
   glClearColor(0.0, 0.5, 0.5, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -145,6 +153,8 @@ int main(int argc, char **argv) {
 	fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
     }
 
+    startTime = glutGet(GLUT_ELAPSED_TIME);
+    
     init();
     glutDisplayFunc(display);
     glutIdleFunc(idle);
