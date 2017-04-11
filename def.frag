@@ -1,6 +1,6 @@
 #version 300 es
 
-precision highp float; //"some drivers required this next line to function properly"???
+precision highp float; //"some drivers required this next line to function properly"
 
 //in vec4 gl_FragCoord;
 
