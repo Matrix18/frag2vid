@@ -43,7 +43,7 @@ static uint8_t *rgb = NULL;
 GLuint vao, vbo;
 GLuint shaderprogram;
 const char *vertsrc = "def.vert"; //default filenames
-const char *fragsrc = "def.frag";
+char *fragsrc = "def.frag";
 const GLfloat quad[4][2] = {
     {  -1.0,  1.0  }, 
     {  -1.0, -1.0  }, 
@@ -58,15 +58,32 @@ static const float MS_PER_SECOND = 1000.0;
 static unsigned int startTime;
 
 //option parsing
+
+struct Arg: public option::Arg
+{ 
+  static option::ArgStatus Required(const option::Option& option, bool msg)
+  {
+    if(option.arg != 0)
+      return option::ARG_OK;
+
+    if(msg) {
+      std::cout << option.name << " requires an argument\n";
+      return option::ARG_ILLEGAL;
+    }
+  }
+};
+
 enum  optionIndex { UNKNOWN, HELP, FILENAME, WIDTH, HEIGHT };
+
 const option::Descriptor usage[] =
 {
   {HELP, 0, "?", "help", option::Arg::None, "-? \t--help \tPrint usage and exit"},
-  {FILENAME, 0, "f", "file", option::Arg::None, "-f \t--file \tFilename of fragment shader to render"},
-  {WIDTH, 0, "w", "width", option::Arg::None, "-w \t--width \tWidth at which to render, must be less than screen width"},
-  {HEIGHT, 0 , "h", "height", option::Arg::None, "-h \t--height \tHeight at which to render, must be less than screen height"},
+  {FILENAME, 0, "f", "file", Arg::Required, "-f \t--file \tFilename of fragment shader to render"},
+  {WIDTH, 0, "w", "width", Arg::Required, "-w \t--width \tWidth at which to render, must be less than screen width"},
+  {HEIGHT, 0 , "h", "height", Arg::Required, "-h \t--height \tHeight at which to render, must be less than screen height"},
   {0,0,0,0,0,0}
 };
+
 
 static int model_finished(void) {
   return nframes >= max_nframes;
@@ -167,6 +184,24 @@ int main(int argc, char **argv) {
     return 0;
   }
 
+  for(int i = 0; i < parse.optionsCount(); ++i) {
+
+    option::Option& opt = buffer[i];
+    switch(opt.index()) {
+
+      case FILENAME:
+	fragsrc = opt.arg;
+	break;
+	
+      case WIDTH:
+	width = atoi(opt.arg);
+	break;
+	
+      case HEIGHT:
+	height = atoi(opt.arg);
+	break;
+    }
+  }
   
   GLint glut_display;
   glutInit(&argc, argv);
