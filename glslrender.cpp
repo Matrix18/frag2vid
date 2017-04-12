@@ -2,7 +2,6 @@
  * frag2vid
  * render fragment shader on fullscreen quad to mpeg video
  * TODO: =clean up shader programs and objects on exit (atexit(deinit))
- *       =parameterize rendering resolution
  *       =texture uniforms
  *       =add cycling timer and bpm parameter 
  */
@@ -43,7 +42,7 @@ static uint8_t *rgb = NULL;
 GLuint vao, vbo;
 GLuint shaderprogram;
 const char *vertsrc = "def.vert"; //default filenames
-char *fragsrc = "def.frag";
+char *fragsrc = "def.frag";  //can be altered by cli arg
 const GLfloat quad[4][2] = {
     {  -1.0,  1.0  }, 
     {  -1.0, -1.0  }, 
@@ -51,14 +50,13 @@ const GLfloat quad[4][2] = {
     {   1.0, -1.0  } };
 
 //shader uniforms
-static glm::vec2 uResolution((float)height, (float)width);
+static glm::vec2 uResolution;
 static float uTime = 0.0;
 
 static const float MS_PER_SECOND = 1000.0;
 static unsigned int startTime;
 
 //option parsing
-
 struct Arg: public option::Arg
 { 
   static option::ArgStatus Required(const option::Option& option, bool msg)
@@ -81,7 +79,7 @@ const option::Descriptor usage[] =
   {FILENAME, 0, "f", "file", Arg::Required, "-f \t--file \tFilename of fragment shader to render"},
   {WIDTH, 0, "w", "width", Arg::Required, "-w \t--width \tWidth at which to render, must be less than screen width"},
   {HEIGHT, 0 , "h", "height", Arg::Required, "-h \t--height \tHeight at which to render, must be less than screen height"},
-  {0,0,0,0,0,0}
+  {0,0,0,0,0,0} //necessary for accuracy when fed into option::Stats
 };
 
 
@@ -130,6 +128,9 @@ static void draw_scene(void) {
   glUseProgram(shaderprogram);
 
   //set uniforms
+  uResolution.y = (float)height;
+  uResolution.x = (float)width;
+  
   glUniform2fv( glGetUniformLocation(shaderprogram, "resolution"), 1, glm::value_ptr(uResolution) );
 
   uTime = (float)(glutGet(GLUT_ELAPSED_TIME) - startTime) / MS_PER_SECOND; 
