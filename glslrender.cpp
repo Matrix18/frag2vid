@@ -53,8 +53,10 @@ const GLfloat quad[4][2] = {
 static glm::vec2 uResolution;
 static float uTime = 0.0;
 
+//timing variables
 static const float MS_PER_SECOND = 1000.0;
 static unsigned int startTime;
+static unsigned int maxTime = 0; 
 
 //option parsing
 struct Arg: public option::Arg
@@ -71,7 +73,7 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex { UNKNOWN, HELP, FILENAME, WIDTH, HEIGHT };
+enum  optionIndex { UNKNOWN, HELP, FILENAME, WIDTH, HEIGHT, RUNTIME };
 
 const option::Descriptor usage[] =
 {
@@ -79,18 +81,27 @@ const option::Descriptor usage[] =
   {FILENAME, 0, "f", "file", Arg::Required, "-f \t--file \tFilename of fragment shader to render"},
   {WIDTH, 0, "w", "width", Arg::Required, "-w \t--width \tWidth at which to render, must be less than screen width"},
   {HEIGHT, 0 , "h", "height", Arg::Required, "-h \t--height \tHeight at which to render, must be less than screen height"},
+  {RUNTIME, 0, "t", "time", Arg::Required, "-t \t--time \tTotal time to render in seconds"},
   {0,0,0,0,0,0} //necessary for accuracy when fed into option::Stats
 };
 
 
 static int model_finished(void) {
-  return nframes >= max_nframes;
+
+  if(maxTime > 0) {
+
+    return glutGet(GLUT_ELAPSED_TIME) >= maxTime;
+    
+  } else {
+    
+    return nframes >= max_nframes;
+  }
 }
 
 static void init(void)  {
     
   glReadBuffer(GL_BACK); //originally GL_BACK
-  glDrawBuffer(GL_BACK); //GL_FRONT_AND_BACK subverts double buffering but then glReadPixels performs correctly...
+  glDrawBuffer(GL_BACK); //GL_FRONT_AND_BACK subverts double buffering
     
   //GL predrawing
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -201,6 +212,9 @@ int main(int argc, char **argv) {
       case HEIGHT:
 	height = atoi(opt.arg);
 	break;
+
+      case RUNTIME:
+	maxTime = atoi(opt.arg) * MS_PER_SECOND;
     }
   }
   
