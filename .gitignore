@@ -2,3 +2,6 @@
 *~
 *.mpg
 *.out
+*.exe
+*.bin
+*.dll

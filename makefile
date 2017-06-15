@@ -1,2 +1,19 @@
-frag2vid: glslrender.cpp encoder.cpp shaders.cpp
-	g++ glslrender.cpp shaders.cpp encoder.cpp -lavcodec -lavformat -lavutil -lswscale -lGL -lGLU -lglut -lpng -lGLEW -lstdc++ -fpermissive -g
+CC = g++
+
+CFLAGS = -Wall -Wextra -ggdb -fpermissive
+
+UNAME := $(shell uname)
+
+#is glu actually necessary...
+
+ifeq ($(UNAME), Linux)
+LDFLAGS = -lGL -lGLU -lGLEW -lglut -lpng -lavcodec -lavformat -lavutil -lswscale -lstdc++
+else
+LDFLAGS = -lopengl32 -lglew32 -lfreeglut -lpng -lavcodec -lavformat -lavutil -lswscale -lstdc++
+endif
+
+SOURCES = glslrender.cpp encoder.cpp shaders.cpp
+TARGET = frag2vid
+
+$(TARGET): $(SOURCES)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
