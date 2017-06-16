@@ -4,10 +4,8 @@ CFLAGS = -Wall -Wextra -ggdb -fpermissive
 
 UNAME := $(shell uname)
 
-#is glu actually necessary...
-
 ifeq ($(UNAME), Linux)
-LDFLAGS = -lGL -lGLU -lGLEW -lglut -lpng -lavcodec -lavformat -lavutil -lswscale -lstdc++
+LDFLAGS = -lGL -lGLEW -lglut -lpng -lavcodec -lavformat -lavutil -lswscale -lstdc++
 else
 LDFLAGS = -lopengl32 -lglew32 -lfreeglut -lpng -lavcodec -lavformat -lavutil -lswscale -lstdc++
 endif
